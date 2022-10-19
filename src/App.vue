@@ -1,32 +1,68 @@
 <template>
   <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
+
+    <b-navbar toggleable="lg" type="dark" variant="dark" v-if="verifyLogin">
+      
+      <b-navbar-brand to="/projects">Project Manager</b-navbar-brand>
+      
+      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+
+      <b-collapse id="nav-collapse" class="d-flex flex-row justify-content-center" is-nav>
+        <b-navbar-nav>
+          <b-nav-item to="/projects">Meus projetos</b-nav-item>
+        </b-navbar-nav>
+        <b-navbar-nav>
+          <b-nav-item to="/register">Criar projeto</b-nav-item>
+        </b-navbar-nav>
+
+        <b-navbar-nav class="ml-auto">       
+          <b-nav-item-dropdown right>
+            <template #button-content>
+              <em>Usuário</em>
+            </template>
+            <b-dropdown-item @click="logout()">Sair</b-dropdown-item>
+          </b-nav-item-dropdown>
+        </b-navbar-nav>
+      </b-collapse>
+    </b-navbar>
+
+    <transition name="fade" mode="out-in">
     <router-view/>
+    </transition>
   </div>
 </template>
-
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.fade-enter-active, .fade-leave-active {
+  transition-duration: 0.2s;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.fade-enter, .fade-leave {
+  opacity: 0;
+}
+</style>
+<script>
+export default {
+  computed: {
+    verifyLogin() {
+      return this.$route.name !== "login" && this.$route.name !== "user";
+    }
+  },
+
+  methods: {
+    logout() {
+      localStorage.removeItem('authUser');
+      this.$router.push('login')
+    }
+  }
+}
+</script>
+<style>
+.menu {
+  display: flex;
   text-align: center;
-  color: #2c3e50;
+  justify-content: space-around;
 }
 
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
 </style>
