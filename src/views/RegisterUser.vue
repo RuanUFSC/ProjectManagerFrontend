@@ -76,6 +76,7 @@
             type="button"
             block
             @click="register"
+            :disabled='isDisabled'
           >
             Criar conta
           </b-button>
@@ -183,6 +184,21 @@ export default {
       }
       return !this.$v.form[field].$error;
     }
+  },
+  computed: {
+    isDisabled: function(){      
+      console.log(this.$v.form.username.$model.length > 2,
+      this.$v.form.name.$model.length > 2,
+        !/[0-9]/.test(this.$v.form.name.$model))
+      if(
+        this.$v.form.username.$model.length > 2 &&
+        this.$v.form.name.$model.length > 2 &&
+        !/[0-9]/.test(this.$v.form.name.$model)) {
+        return false
+      } else {
+        return true
+      }     
+    }   
   },
 }
 </script>
