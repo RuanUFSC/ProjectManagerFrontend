@@ -7,40 +7,43 @@
       <b-form-group label="Titulo" label-for="title">
         <b-form-input
           id="title"
-          v-model.trim="$v.form.title.$model"
           type="text"
           required
           autocomplete="off"
-          :state="getValidation"
+          v-model.trim="$v.form.title.$model"
+          :state="getValidation('title')"
         ></b-form-input>
       </b-form-group>      
       <b-form-group label="CEP" label-for="zipcode">
         <b-form-input
           id="zipcode"
-          v-model="form.zipcode"
+          v-model.trim="$v.form.zipcode.$model"
           type="text"
           required
           autocomplete="off"
+          :state="getValidation('zipcode')"
         ></b-form-input>
       </b-form-group>
       <b-form-group label="Data de vencimento" label-for="deadline">
         <b-form-datepicker
           id="deadline"
-          v-model="form.deadline"
+          v-model.trim="$v.form.deadline.$model"
           label-no-date-selected="Selecione uma data"
+          :state="getValidation('deadline')"
         ></b-form-datepicker>
       </b-form-group>
       <b-form-group label="Custo" label-for="cost">
         <b-form-input
           id="cost"
-          v-model="form.cost"
+          v-model.trim="$v.form.cost.$model"
           type="text"
           required
           autocomplete="off"
+          :state="getValidation('cost')"
         ></b-form-input>
       </b-form-group>
       <b-form-group>
-      <b-button type="submit" 
+      <b-button type="submit" :disabled='isDisabled'
       class="col-12" variant="outline-primary" @click="saveProject">
         Salvar
       </b-button>
@@ -50,21 +53,20 @@
 </template>
 
 <script>
+import { required, minLength, maxLength, decimal, integer } from "vuelidate/lib/validators";
 import ToastMixin from "@/mixins/toastMixin.js";
-import { required, minLength } from "vuelidate/lib/validators";
 import axios from 'axios';
 
 export default {
   name: "Edit",
-
   mixins: [ToastMixin],
   data() {
     return {
       form: {
         title: "",
-        cost: "",
-        deadline: "",
-        zipcode: "",        
+        zipcode: "",  
+        deadline: "", 
+        cost: "",     
       },
     };
   },
@@ -75,6 +77,20 @@ export default {
         required,
         minLength: minLength(3),
       },
+      zipcode: {
+        required,
+        minLength: minLength(8),
+        maxLength: maxLength(8),
+        integer
+      },
+      deadline: {
+        required,
+      },
+      cost: {
+        required,
+        minLength: minLength(1),
+        decimal
+      }
     },
   },
 
@@ -90,8 +106,10 @@ export default {
         this.$router.push({ name: "projects" })
     }
   },
-
   methods: {
+    getValidation(field) {
+      return !this.$v.form[field].$error;
+    },
     saveProject() {
         var user= JSON.parse(localStorage.getItem("authUser")).username
         var config = { headers: { username: user } }
@@ -122,13 +140,19 @@ export default {
   },
 
   computed: {
-    getValidation() {
-      if (this.$v.form.title.$dirty === false) {
-        return null;
-      }
-
-      return !this.$v.form.title.$error;
-    },      
+    isDisabled: function(){
+      if(this.$v.form.title.$model.length < 3 || 
+      !this.$v.form.deadline.$model ||
+      !this.$v.form.cost.$model.length ||
+      this.$v.form.zipcode.$model.toString().length !== 8 ||
+      !/^\d+(?:\.\d+)?$/.test(this.$v.form.cost.$model) ||
+      !/^\d+$/.test(this.$v.form.zipcode.$model)
+      ) {
+        return true
+      } else {
+        return false
+      }     
+    }   
   },
 };
 </script>
