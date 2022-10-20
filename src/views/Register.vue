@@ -52,6 +52,7 @@
         <b-button
           class="col-12" 
           type="submit" 
+          :disabled='isDisabled'
           variant="outline-primary" 
           @click="createProject"
         >
@@ -65,14 +66,13 @@
 
 </style>
 <script>
-
-import { required, minLength, decimal } from "vuelidate/lib/validators";
+import { required, minLength, maxLength, decimal, integer } from "vuelidate/lib/validators";
 import ToastMixin from "@/mixins/toastMixin.js";
 import axios from "axios";
 
 export default {
   name: "Register",
-
+  mixins: [ToastMixin],
   data() {
     return {
       form: {
@@ -95,13 +95,15 @@ export default {
       zipcode: {
         required,
         minLength: minLength(8),
+        maxLength: maxLength(8),
+        integer
       },
       deadline: {
         required,
       },
       cost: {
         required,
-        minLength: minLength(3),
+        minLength: minLength(1),
         decimal
       }
     },
@@ -112,43 +114,16 @@ export default {
     getToday() {
       return new Date().toISOString().split("T")[0];
     },
-    
-    //register() {
-    //  this.$v.$touch();
-    //  if(this.$v.$error) {
-    //    return;
-    //  }
-//
-    //  var user = {
-    //    "name": this.form.name,
-    //    "username": this.form.username,
-    //    "password": this.form.password
-    //  }
-//
-    //  axios
-    //  .post("http://localhost:3000/api/users", user)
-    //  .then(
-    //    function (response) {
-    //      console.log("Response do axios", response);
-    //      this.showToast("success", "Sucesso!", "Usuário criado com sucesso");
-    //      this.goToLogin();
-    //    }.bind(this)
-    //  )
-    //  .catch(function (error) {
-    //    console.log(error);
-    //    alert("Erro ao enviar formulário!", error.message);
-    //  });
-    //},
-//
-    //goToLogin() {
-    //  this.$router.push({ name: 'login' });
-    //},
-    //
+
     getValidation(field) {
-      if(this.$v.form.$dirty === false) {
+      if(this.$v.form[field].$dirty === false) {
         return null;
       }
       return !this.$v.form[field].$error;
+      //if(this.$v.form[field].$dirty === false) {
+      //  return false;
+      //}
+      //return !this.$v.form[field].$error;
     },
 
     createProject() {
@@ -179,15 +154,20 @@ export default {
        this.$router.push({ name: "projects" });
       }
   },
-
-  //computed: {
-  //  getValidation(field) {
-  //    if(this.$v.form.$dirty === false) {
-  //      return null;
-  //    }
-  //    return !this.$v.form[field].$error;
-  //  }
-  //}
+  computed: {
+    isDisabled: function(){      
+      if(this.$v.form.title.$model.length < 3 || 
+      !this.$v.form.deadline.$model ||
+      this.$v.form.zipcode.$model.toString().length !== 8 ||
+      !/^\d+(?:\.\d+)?$/.test(this.$v.form.cost.$model) ||
+      !/^\d+$/.test(this.$v.form.zipcode.$model)
+      ) {
+        return true
+      } else {
+        return false
+      }     
+    }   
+  },
 }
 </script>
   

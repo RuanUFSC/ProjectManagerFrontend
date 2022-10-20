@@ -99,7 +99,7 @@
 
 <script>
 
-import { required, minLength, sameAs } from "vuelidate/lib/validators";
+import { required, minLength, sameAs, alphaNum } from "vuelidate/lib/validators";
 import ToastMixin from "@/mixins/toastMixin.js";
 import axios from "axios";
 
@@ -134,6 +134,7 @@ export default {
       name: {
         required,
         minLength: minLength(3),
+        alphaNum
       },
       passwordConfirm: {
         required, 
@@ -174,7 +175,7 @@ export default {
     },
     
     getValidation(field) {
-      if(this.$v.form.$dirty === false) {
+      if(this.$v.form[field].$dirty === false) {
         return null;
       }
       return !this.$v.form[field].$error;
