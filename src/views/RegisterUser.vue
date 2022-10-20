@@ -165,8 +165,11 @@ export default {
         }.bind(this)
       )
       .catch(function (error) {
-        console.log(error);
-        alert("Erro ao enviar formulário!", error.message);
+        if(error.response.data.message == 'Username já foi usado'){
+          alert("Username já foi usado");
+        } else {
+          alert("Erro ao enviar formulário!", error.message);
+        }         
       });
     },
 

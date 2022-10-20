@@ -1,15 +1,17 @@
+
 <template>
-  <div class="container mt-2">
+  <div class="container mt-2 p-3">
     <h1>Projetos</h1>
-    <b-card-group deck v-for="project in projects" :key="project.id" class="col-8">
-        <b-card class="d-flex mb-2">
+    <template>
+    <b-card-group deck v-for="project in projects" :key="project.id" class="col-8 mt-2">
+        <b-card class="d-flex mb-2" v-if="project.deadline !== undefined">
           <div class="container-projects">
             <b-list-group flush class="col-project col-10">
               <div class="d-flex flex-row justify-content-between">
                 <b-list-group-item class="col-12"><strong>Título:</strong> {{ project.title }}</b-list-group-item>
               </div>              
               <div class="d-flex justify-content-between">
-                <b-list-group-item  class="col-12"><strong>Localidade:</strong> {{  project.address }}</b-list-group-item>
+                <b-list-group-item class="col-12"><strong>Localidade:</strong> {{  project.address }}</b-list-group-item>
               </div>
               <div class="d-flex justify-content-between">
                 <b-list-group-item  class="col-12"><strong>Vencimento</strong> {{ new Date(project.deadline).toLocaleString('pt-BR') }}</b-list-group-item>
@@ -56,8 +58,21 @@
             </div>
           </div>
         </b-card>
+        <b-card class="d-flex mt-4 align-items-center" v-else>
+          <div class="d-flex flex-column align-items-center">
+            <h3>Sem projetos cadastrados</h3>
+            <b-button
+                variant="outline-secondary"
+                class="my-2"
+                @click="$router.push('register')"
+                v-b-tooltip.hover
+                title="Cadastrar um projeto"
+              >     Quero cadastrar um projeto
+              </b-button>       
+          </div>
+        </b-card>
     </b-card-group>
-
+  </template>
     <b-modal ref="modalRemove" hide-footer title="Exclusão de projeto">
       <div class="d-block text-center">
         Deseja realmente excluir esse projeto? <!-- {{ projectSelected.title }} -->
@@ -225,11 +240,5 @@ export default {
     },
 
   },
-
-  computed: {
-    isProjectsEmpty() {
-      return this.projects.length === 0;
-    }
-  }
 }
 </script>
